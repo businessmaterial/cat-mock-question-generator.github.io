@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAT Question Formatter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #3a86ff;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f72585;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7ff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--secondary);
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--gray-light);
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray-light);
+            color: var(--dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d1d7e0;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d91a6a;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #3ab4d9;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            flex: 1;
+        }
+        
+        .option-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+        
+        .option-row input {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        
+        .question-list {
+            margin-top: 1.5rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 400px;
+            padding-right: 0.5rem;
+        }
+        
+        .question-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+            position: relative;
+        }
+        
+        .question-item h4 {
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+        
+        .question-item p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .question-meta {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .question-order {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        #output {
+            white-space: pre-wrap;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            min-height: 400px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 1px solid var(--gray-light);
+        }
+        
+        .output-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        
+        .badge-mcq {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .badge-tita {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+        
+        .badge-single {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        
+        .badge-double {
+            background-color: #f3e5f5;
+            color: #8e24aa;
+        }
+        
+        .badge-varc {
+            background-color: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .badge-passage {
+            background-color: #e0f7fa;
+            color: #00838f;
+        }
+        
+        .badge-standalone {
+            background-color: #f1f8e9;
+            color: #689f38;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .scrollable {
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .formatting-toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .format-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .format-btn:hover {
+            background: var(--gray);
+            color: white;
+        }
+        
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>CAT Question Formatter</h1>
+    
+    <div class="container">
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" data-section="varc">VARC</div>
+                <div class="tab" data-section="dilr">DILR</div>
+                <div class="tab" data-section="qa">QA</div>
+            </div>
+            
+            <div id="varc-tab" class="tab-content active scrollable">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="varc-id">Question ID:</label>
+                        <input type="number" id="varc-id" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="varc-response-type">Response Type:</label>
+                        <select id="varc-response-type">
+                            <option value="mcq">MCQ</option>
+                            <option value="tita">TITA</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="varc-question-type">Question Type:</label>
+                        <select id="varc-question-type">
+                            <option value="passage-first">Passage first, then question</option>
+                            <option value="question-first">Question first, then passage</option>
+                            <option value="standalone">Standalone question</option>
+                        </select>
+                    </div>
+                    
+                    <div id="varc-passage-group" class="form-group">
+                        <label for="varc-passage">Passage:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="varc-passage" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="varc-passage" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="varc-passage" rows="6"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="varc-image">Image URL (optional):</label>
+                        <input type="text" id="varc-image" placeholder="Paste image link here">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="varc-question">Question:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="varc-question" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="varc-question" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="varc-question" rows="3"></textarea>
+                    </div>
+                    
+                    <div id="varc-mcq-fields">
+                        <div class="form-group">
+                            <label>Options:</label>
+                            <div id="varc-options-container">
+                                <div class="option-row">
+                                    <input type="text" class="varc-option" placeholder="Option 1">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="varc-option" placeholder="Option 2">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="varc-option" placeholder="Option 3">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="varc-option" placeholder="Option 4">
+                                </div>
+                            </div>
+                            <button id="varc-add-option" class="btn btn-secondary btn-sm">+ Add Option</button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="varc-correctAnswer">Correct Answer (option number):</label>
+                            <input type="number" id="varc-correctAnswer" min="1" max="4" value="1">
+                        </div>
+                    </div>
+                    
+                    <div id="varc-tita-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="varc-tita-answer">Correct Answer (exact value):</label>
+                            <input type="text" id="varc-tita-answer">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="varc-explanation">Explanation:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="varc-explanation" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="varc-explanation" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="varc-explanation" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="varc-add-btn" class="btn btn-primary">Add VARC Question</button>
+                        <button id="varc-clear-btn" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </div>
+                
+                <div class="question-list" id="varc-questions-list"></div>
+            </div>
+            
+            <div id="dilr-tab" class="tab-content scrollable">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="dilr-id">Question ID:</label>
+                        <input type="number" id="dilr-id" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dilr-response-type">Response Type:</label>
+                        <select id="dilr-response-type">
+                            <option value="mcq">MCQ</option>
+                            <option value="tita">TITA</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dilr-question-type">Question Type:</label>
+                        <select id="dilr-question-type">
+                            <option value="description-first">Description first, then question</option>
+                            <option value="question-first">Question first, then description</option>
+                            <option value="standalone">Standalone question</option>
+                        </select>
+                    </div>
+                    
+                    <div id="dilr-description-group" class="form-group">
+                        <label for="dilr-description">Description/Instructions:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="dilr-description" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="dilr-description" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="dilr-description" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dilr-image">Image URL (optional):</label>
+                        <input type="text" id="dilr-image" placeholder="Paste image link here">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dilr-question">Question:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="dilr-question" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="dilr-question" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="dilr-question" rows="3"></textarea>
+                    </div>
+                    
+                    <div id="dilr-mcq-fields">
+                        <div class="form-group">
+                            <label>Options:</label>
+                            <div id="dilr-options-container">
+                                <div class="option-row">
+                                    <input type="text" class="dilr-option" placeholder="Option 1">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="dilr-option" placeholder="Option 2">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="dilr-option" placeholder="Option 3">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="dilr-option" placeholder="Option 4">
+                                </div>
+                            </div>
+                            <button id="dilr-add-option" class="btn btn-secondary btn-sm">+ Add Option</button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dilr-correctAnswer">Correct Answer (option number):</label>
+                            <input type="number" id="dilr-correctAnswer" min="1" max="4" value="1">
+                        </div>
+                    </div>
+                    
+                    <div id="dilr-tita-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="dilr-tita-answer">Correct Answer (exact value):</label>
+                            <input type="text" id="dilr-tita-answer">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dilr-explanation">Explanation:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="dilr-explanation" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="dilr-explanation" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="dilr-explanation" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="dilr-add-btn" class="btn btn-primary">Add DILR Question</button>
+                        <button id="dilr-clear-btn" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </div>
+                
+                <div class="question-list" id="dilr-questions-list"></div>
+            </div>
+            
+            <div id="qa-tab" class="tab-content scrollable">
+                <div class="form-section">
+                    <div class="form-group">
+                        <label for="qa-id">Question ID:</label>
+                        <input type="number" id="qa-id" min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qa-response-type">Response Type:</label>
+                        <select id="qa-response-type">
+                            <option value="mcq">MCQ</option>
+                            <option value="tita">TITA</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qa-question-type">Question Type:</label>
+                        <select id="qa-question-type">
+                            <option value="standalone">Standalone question</option>
+                            <option value="description-first">Description first, then question</option>
+                        </select>
+                    </div>
+                    
+                    <div id="qa-description-group" class="form-group" style="display: none;">
+                        <label for="qa-description">Description/Instructions:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="qa-description" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="qa-description" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="qa-description" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qa-image">Image URL (optional):</label>
+                        <input type="text" id="qa-image" placeholder="Paste image link here">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qa-question">Question:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="qa-question" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="qa-question" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="qa-question" rows="3"></textarea>
+                    </div>
+                    
+                    <div id="qa-mcq-fields">
+                        <div class="form-group">
+                            <label>Options:</label>
+                            <div id="qa-options-container">
+                                <div class="option-row">
+                                    <input type="text" class="qa-option" placeholder="Option 1">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="qa-option" placeholder="Option 2">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="qa-option" placeholder="Option 3">
+                                </div>
+                                <div class="option-row">
+                                    <input type="text" class="qa-option" placeholder="Option 4">
+                                </div>
+                            </div>
+                            <button id="qa-add-option" class="btn btn-secondary btn-sm">+ Add Option</button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="qa-correctAnswer">Correct Answer (option number):</label>
+                            <input type="number" id="qa-correctAnswer" min="1" max="4" value="1">
+                        </div>
+                    </div>
+                    
+                    <div id="qa-tita-fields" style="display: none;">
+                        <div class="form-group">
+                            <label for="qa-tita-answer">Correct Answer (exact value):</label>
+                            <input type="text" id="qa-tita-answer">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qa-explanation">Explanation:</label>
+                        <div class="formatting-toolbar">
+                            <button class="format-btn" data-target="qa-explanation" data-tag="strong">Bold</button>
+                            <button class="format-btn" data-target="qa-explanation" data-tag="br">Line Break</button>
+                        </div>
+                        <textarea id="qa-explanation" rows="4"></textarea>
+                    </div>
+                    
+                    <div class="btn-group">
+                        <button id="qa-add-btn" class="btn btn-primary">Add QA Question</button>
+                        <button id="qa-clear-btn" class="btn btn-secondary">Clear Form</button>
+                    </div>
+                </div>
+                
+                <div class="question-list" id="qa-questions-list"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Formatted Output</h2>
+            
+            <div class="btn-group">
+                <button id="export-varc" class="btn btn-secondary">VARC Only</button>
+                <button id="export-dilr" class="btn btn-secondary">DILR Only</button>
+                <button id="export-qa" class="btn btn-secondary">QA Only</button>
+                <button id="export-all" class="btn btn-success">Export All</button>
+            </div>
+            
+            <div id="output">// Your formatted questions will appear here</div>
+            
+            <div class="output-actions">
+                <button id="clear-output-btn" class="btn btn-secondary">Clear Output</button>
+                <button id="copy-btn" class="btn btn-primary">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Data storage
+            const questionsData = {
+                varc: [],
+                dilr: [],
+                qa: []
+            };
+            
+            // Tab switching
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const section = this.dataset.section;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show correct content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${section}-tab`).classList.add('active');
+                });
+            });
+            
+            // Response Type switching (common for all sections)
+            document.querySelectorAll('[id$="-response-type"]').forEach(select => {
+                select.addEventListener('change', function() {
+                    const section = this.id.split('-')[0];
+                    const type = this.value;
+                    
+                    document.getElementById(`${section}-mcq-fields`).style.display = type === 'mcq' ? 'block' : 'none';
+                    document.getElementById(`${section}-tita-fields`).style.display = type === 'tita' ? 'block' : 'none';
+                });
+            });
+            
+            // Question Type switching (common for all sections)
+            document.querySelectorAll('[id$="-question-type"]').forEach(select => {
+                select.addEventListener('change', function() {
+                    const section = this.id.split('-')[0];
+                    const type = this.value;
+                    
+                    if (section === 'varc') {
+                        document.getElementById('varc-passage-group').style.display = 
+                            type === 'standalone' ? 'none' : 'block';
+                    } else if (section === 'dilr') {
+                        document.getElementById('dilr-description-group').style.display = 
+                            type === 'standalone' ? 'none' : 'block';
+                    } else if (section === 'qa') {
+                        document.getElementById('qa-description-group').style.display = 
+                            type === 'standalone' ? 'none' : 'block';
+                    }
+                });
+            });
+            
+            // Formatting buttons
+            document.querySelectorAll('.format-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const tag = this.dataset.tag;
+                    const textarea = document.getElementById(targetId);
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const selectedText = textarea.value.substring(start, end);
+                    const beforeText = textarea.value.substring(0, start);
+                    const afterText = textarea.value.substring(end);
+                    
+                    if (tag === 'br') {
+                        textarea.value = beforeText + '\n' + afterText;
+                        textarea.selectionStart = textarea.selectionEnd = start + 1;
+                    } else {
+                        const wrappedText = `<${tag}>${selectedText}</${tag}>`;
+                        textarea.value = beforeText + wrappedText + afterText;
+                        textarea.selectionStart = start;
+                        textarea.selectionEnd = start + wrappedText.length;
+                    }
+                    
+                    textarea.focus();
+                });
+            });
+            
+            // Helper functions
+            function formatText(text) {
+                return text.replace(/\n/g, '<br>');
+            }
+            
+            function clearForm(section) {
+                document.querySelectorAll(`#${section}-tab input, #${section}-tab textarea`).forEach(el => {
+                    if (el.type !== 'button') {
+                        el.value = '';
+                    }
+                });
+                
+                // Reset options to 4 default ones
+                const container = document.getElementById(`${section}-options-container`);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="option-row">
+                            <input type="text" class="${section}-option" placeholder="Option 1">
+                        </div>
+                        <div class="option-row">
+                            <input type="text" class="${section}-option" placeholder="Option 2">
+                        </div>
+                        <div class="option-row">
+                            <input type="text" class="${section}-option" placeholder="Option 3">
+                        </div>
+                        <div class="option-row">
+                            <input type="text" class="${section}-option" placeholder="Option 4">
+                        </div>
+                    `;
+                }
+                
+                // Reset correct answer inputs
+                if (section === 'varc' || section === 'dilr' || section === 'qa') {
+                    document.getElementById(`${section}-correctAnswer`).value = '1';
+                    document.getElementById(`${section}-tita-answer`).value = '';
+                }
+                
+                // Reset type selectors
+                document.getElementById(`${section}-response-type`).value = 'mcq';
+                document.getElementById(`${section}-mcq-fields`).style.display = 'block';
+                document.getElementById(`${section}-tita-fields`).style.display = 'none';
+                
+                if (section === 'varc') {
+                    document.getElementById('varc-question-type').value = 'passage-first';
+                    document.getElementById('varc-passage-group').style.display = 'block';
+                } else if (section === 'dilr') {
+                    document.getElementById('dilr-question-type').value = 'description-first';
+                    document.getElementById('dilr-description-group').style.display = 'block';
+                } else if (section === 'qa') {
+                    document.getElementById('qa-question-type').value = 'standalone';
+                    document.getElementById('qa-description-group').style.display = 'none';
+                }
+            }
+            
+            function updateQuestionList(section) {
+                const listContainer = document.getElementById(`${section}-questions-list`);
+                listContainer.innerHTML = '';
+                
+                if (questionsData[section].length === 0) {
+                    listContainer.innerHTML = '<p style="color: var(--gray); text-align: center;">No questions added yet</p>';
+                    return;
+                }
+                
+                questionsData[section].forEach((question, index) => {
+                    const questionItem = document.createElement('div');
+                    questionItem.className = 'question-item';
+                    
+                    let previewText = question.question.length > 50 
+                        ? question.question.substring(0, 50) + '...' 
+                        : question.question;
+                    
+                    // Determine badges based on response type and question type
+                    let responseBadgeClass = question.tita ? 'badge-tita' : 'badge-mcq';
+                    let responseBadgeText = question.tita ? 'TITA' : 'MCQ';
+                    
+                    let typeBadgeClass = '';
+                    let typeBadgeText = '';
+                    
+                    if (section === 'varc') {
+                        if (question.questionType === 'standalone') {
+                            typeBadgeClass = 'badge-standalone';
+                            typeBadgeText = 'Standalone';
+                        } else {
+                            typeBadgeClass = 'badge-passage';
+                            typeBadgeText = question.questionType === 'passage-first' ? 'Passage First' : 'Question First';
+                        }
+                    } else if (section === 'dilr') {
+                        if (question.questionType === 'standalone') {
+                            typeBadgeClass = 'badge-standalone';
+                            typeBadgeText = 'Standalone';
+                        } else {
+                            typeBadgeClass = 'badge-passage';
+                            typeBadgeText = question.questionType === 'description-first' ? 'Desc First' : 'Q First';
+                        }
+                    } else if (section === 'qa') {
+                        if (question.questionType === 'standalone') {
+                            typeBadgeClass = 'badge-standalone';
+                            typeBadgeText = 'Standalone';
+                        } else {
+                            typeBadgeClass = 'badge-passage';
+                            typeBadgeText = 'Desc First';
+                        }
+                    }
+                    
+                    questionItem.innerHTML = `
+                        <div class="question-order">#${question.id}</div>
+                        <h4>
+                            <span class="type-badge ${responseBadgeClass}">${responseBadgeText}</span>
+                            <span class="type-badge ${typeBadgeClass}">${typeBadgeText}</span>
+                            ${previewText}
+                        </h4>
+                        ${question.image ? `<p><small>Image: ${question.image.substring(0, 30)}...</small></p>` : ''}
+                        <div class="question-actions">
+                            <button class="btn btn-secondary btn-sm edit-question" data-section="${section}" data-index="${index}">Edit</button>
+                            <button class="btn btn-danger btn-sm delete-question" data-section="${section}" data-index="${index}">Delete</button>
+                            <button class="btn btn-secondary btn-sm move-up" data-section="${section}" data-index="${index}" ${index === 0 ? 'disabled' : ''}>↑</button>
+                            <button class="btn btn-secondary btn-sm move-down" data-section="${section}" data-index="${index}" ${index === questionsData[section].length - 1 ? 'disabled' : ''}>↓</button>
+                        </div>
+                    `;
+                    
+                    listContainer.appendChild(questionItem);
+                });
+                
+                // Add event listeners for edit/delete/move buttons
+                document.querySelectorAll('.edit-question').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const index = parseInt(this.dataset.index);
+                        editQuestion(section, index);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-question').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const index = parseInt(this.dataset.index);
+                        deleteQuestion(section, index);
+                    });
+                });
+                
+                document.querySelectorAll('.move-up').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const index = parseInt(this.dataset.index);
+                        moveQuestionUp(section, index);
+                    });
+                });
+                
+                document.querySelectorAll('.move-down').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const section = this.dataset.section;
+                        const index = parseInt(this.dataset.index);
+                        moveQuestionDown(section, index);
+                    });
+                });
+            }
+            
+            function editQuestion(section, index) {
+                const question = questionsData[section][index];
+                
+                // Fill the form with question data
+                document.getElementById(`${section}-id`).value = question.id;
+                document.getElementById(`${section}-response-type`).value = question.tita ? 'tita' : 'mcq';
+                document.getElementById(`${section}-question-type`).value = question.questionType || 
+                    (section === 'varc' ? 'passage-first' : 
+                     section === 'dilr' ? 'description-first' : 'standalone');
+                
+                // Show/hide fields based on response type
+                document.getElementById(`${section}-mcq-fields`).style.display = question.tita ? 'none' : 'block';
+                document.getElementById(`${section}-tita-fields`).style.display = question.tita ? 'block' : 'none';
+                
+                // Show/hide fields based on question type
+                if (section === 'varc') {
+                    document.getElementById('varc-passage-group').style.display = 
+                        question.questionType === 'standalone' ? 'none' : 'block';
+                    document.getElementById('varc-passage').value = question.passage ? question.passage.replace(/<br>/g, '\n') : '';
+                } else if (section === 'dilr') {
+                    document.getElementById('dilr-description-group').style.display = 
+                        question.questionType === 'standalone' ? 'none' : 'block';
+                    document.getElementById('dilr-description').value = question.description ? question.description.replace(/<br>/g, '\n') : '';
+                } else if (section === 'qa') {
+                    document.getElementById('qa-description-group').style.display = 
+                        question.questionType === 'standalone' ? 'none' : 'block';
+                    document.getElementById('qa-description').value = question.description ? question.description.replace(/<br>/g, '\n') : '';
+                }
+                
+                if (question.image) {
+                    document.getElementById(`${section}-image`).value = question.image;
+                }
+                
+                document.getElementById(`${section}-question`).value = question.question;
+                
+                // Handle options for MCQ questions
+                const optionsContainer = document.getElementById(`${section}-options-container`);
+                if (optionsContainer) {
+                    optionsContainer.innerHTML = '';
+                    if (question.options && question.options.length > 0) {
+                        question.options.forEach((option, i) => {
+                            const optionRow = document.createElement('div');
+                            optionRow.className = 'option-row';
+                            optionRow.innerHTML = `
+                                <input type="text" class="${section}-option" placeholder="Option ${i+1}" value="${option}">
+                                <button class="btn btn-danger btn-sm remove-option">×</button>
+                            `;
+                            optionsContainer.appendChild(optionRow);
+                        });
+                        document.getElementById(`${section}-correctAnswer`).value = question.correctAnswer;
+                    }
+                }
+                
+                // Handle TITA answers
+                if (question.tita) {
+                    document.getElementById(`${section}-tita-answer`).value = question.correctAnswer;
+                }
+                
+                document.getElementById(`${section}-explanation`).value = question.explanation.replace(/<br>/g, '\n');
+                
+                // Remove the question from the array
+                questionsData[section].splice(index, 1);
+                updateQuestionList(section);
+            }
+            
+            function deleteQuestion(section, index) {
+                if (confirm('Are you sure you want to delete this question?')) {
+                    questionsData[section].splice(index, 1);
+                    updateQuestionList(section);
+                }
+            }
+            
+            function moveQuestionUp(section, index) {
+                if (index > 0) {
+                    const temp = questionsData[section][index - 1];
+                    questionsData[section][index - 1] = questionsData[section][index];
+                    questionsData[section][index] = temp;
+                    updateQuestionList(section);
+                }
+            }
+            
+            function moveQuestionDown(section, index) {
+                if (index < questionsData[section].length - 1) {
+                    const temp = questionsData[section][index + 1];
+                    questionsData[section][index + 1] = questionsData[section][index];
+                    questionsData[section][index] = temp;
+                    updateQuestionList(section);
+                }
+            }
+            
+function generateOutput(sections) {
+    let output = 'const questionsData = {\n';
+    
+    sections.forEach(section => {
+        if (questionsData[section].length === 0) return;
+        
+        output += `    ${section}: [\n`;
+        
+        questionsData[section].forEach(question => {
+            output += `        {\n`;
+            output += `            id: ${question.id},\n`;
+            
+            if (question.passage) {
+                output += `            passage: \`${question.passage}\`,\n`;
+            }
+            
+            if (question.description) {
+                output += `            description: \`${question.description}\`,\n`;
+            }
+            
+            output += `            question: "${question.question}",\n`;
+            
+            if (question.image) {
+                output += `            image: "${question.image}",\n`;
+            }
+            
+            if (question.options) {
+                output += `            options: [\n`;
+                output += `                "${question.options.join('",\n                "')}"\n`;
+                output += `            ],\n`;
+            }
+            
+            if (question.tita) {
+                output += `            tita: true,\n`;
+            }
+            
+            if (typeof question.correctAnswer === 'number') {
+                output += `            correctAnswer: ${question.correctAnswer},\n`;
+            } else {
+                output += `            correctAnswer: "${question.correctAnswer}",\n`;
+            }
+            
+            if (question.explanation) {
+                output += `            explanation: \`${question.explanation}\`\n`;
+            } else {
+                // Remove trailing comma if no explanation
+                output = output.replace(/,\s*$/, '\n');
+            }
+            
+            output += `        },\n`;
+        });
+        
+        // Remove trailing comma
+        output = output.replace(/,\s*$/, '\n');
+        
+        output += `    ],\n`;
+    });
+    
+    // Remove trailing comma
+    output = output.replace(/,\s*$/, '\n');
+    
+    output += '};';
+    
+    document.getElementById('output').textContent = output;
+}
+            
+            // Add question buttons
+            document.getElementById('varc-add-btn').addEventListener('click', function() {
+                const id = parseInt(document.getElementById('varc-id').value) || questionsData.varc.length + 1;
+                const responseType = document.getElementById('varc-response-type').value;
+                const questionType = document.getElementById('varc-question-type').value;
+                const passage = questionType !== 'standalone' ? formatText(document.getElementById('varc-passage').value) : '';
+                const question = document.getElementById('varc-question').value;
+                const image = document.getElementById('varc-image').value.trim();
+                const options = responseType === 'mcq' ? 
+                    Array.from(document.querySelectorAll('.varc-option')).map(opt => opt.value.trim()).filter(opt => opt) : 
+                    [];
+                const correctAnswer = responseType === 'mcq' ? 
+                    parseInt(document.getElementById('varc-correctAnswer').value) : 
+                    document.getElementById('varc-tita-answer').value;
+                const explanation = formatText(document.getElementById('varc-explanation').value);
+                
+                if (!question || (responseType === 'mcq' && options.length === 0) || 
+                    (questionType !== 'standalone' && !passage)) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                const questionObj = {
+                    id,
+                    questionType,
+                    question,
+                    correctAnswer,
+                    explanation,
+                    tita: responseType === 'tita'
+                };
+                
+                if (questionType !== 'standalone') {
+                    questionObj.passage = passage;
+                }
+                
+                if (responseType === 'mcq') {
+                    questionObj.options = options;
+                }
+                
+                if (image) {
+                    questionObj.image = image;
+                }
+                
+                questionsData.varc.push(questionObj);
+                
+                updateQuestionList('varc');
+                clearForm('varc');
+            });
+            
+            document.getElementById('dilr-add-btn').addEventListener('click', function() {
+                const id = parseInt(document.getElementById('dilr-id').value) || questionsData.dilr.length + 1;
+                const responseType = document.getElementById('dilr-response-type').value;
+                const questionType = document.getElementById('dilr-question-type').value;
+                const description = questionType !== 'standalone' ? formatText(document.getElementById('dilr-description').value) : '';
+                const question = document.getElementById('dilr-question').value;
+                const image = document.getElementById('dilr-image').value.trim();
+                const options = responseType === 'mcq' ? 
+                    Array.from(document.querySelectorAll('.dilr-option')).map(opt => opt.value.trim()).filter(opt => opt) : 
+                    [];
+                const correctAnswer = responseType === 'mcq' ? 
+                    parseInt(document.getElementById('dilr-correctAnswer').value) : 
+                    document.getElementById('dilr-tita-answer').value;
+                const explanation = formatText(document.getElementById('dilr-explanation').value);
+                
+                if (!question || (responseType === 'mcq' && options.length === 0) || 
+                    (questionType !== 'standalone' && !description)) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                const questionObj = {
+                    id,
+                    questionType,
+                    question,
+                    correctAnswer,
+                    explanation,
+                    tita: responseType === 'tita'
+                };
+                
+                if (questionType !== 'standalone') {
+                    questionObj.description = description;
+                }
+                
+                if (responseType === 'mcq') {
+                    questionObj.options = options;
+                }
+                
+                if (image) {
+                    questionObj.image = image;
+                }
+                
+                questionsData.dilr.push(questionObj);
+                
+                updateQuestionList('dilr');
+                clearForm('dilr');
+            });
+            
+            document.getElementById('qa-add-btn').addEventListener('click', function() {
+                const id = parseInt(document.getElementById('qa-id').value) || questionsData.qa.length + 1;
+                const responseType = document.getElementById('qa-response-type').value;
+                const questionType = document.getElementById('qa-question-type').value;
+                const description = questionType !== 'standalone' ? formatText(document.getElementById('qa-description').value) : '';
+                const question = document.getElementById('qa-question').value;
+                const image = document.getElementById('qa-image').value.trim();
+                const options = responseType === 'mcq' ? 
+                    Array.from(document.querySelectorAll('.qa-option')).map(opt => opt.value.trim()).filter(opt => opt) : 
+                    [];
+                const correctAnswer = responseType === 'mcq' ? 
+                    parseInt(document.getElementById('qa-correctAnswer').value) : 
+                    document.getElementById('qa-tita-answer').value;
+                const explanation = formatText(document.getElementById('qa-explanation').value);
+                
+                if (!question || !correctAnswer || 
+                    (responseType === 'mcq' && options.length === 0) || 
+                    (questionType !== 'standalone' && !description)) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                const questionObj = {
+                    id,
+                    questionType,
+                    question,
+                    correctAnswer,
+                    explanation,
+                    tita: responseType === 'tita'
+                };
+                
+                if (questionType !== 'standalone') {
+                    questionObj.description = description;
+                }
+                
+                if (responseType === 'mcq') {
+                    questionObj.options = options;
+                }
+                
+                if (image) {
+                    questionObj.image = image;
+                }
+                
+                questionsData.qa.push(questionObj);
+                
+                updateQuestionList('qa');
+                clearForm('qa');
+            });
+            
+            // Clear form buttons
+            document.getElementById('varc-clear-btn').addEventListener('click', function() {
+                clearForm('varc');
+            });
+            
+            document.getElementById('dilr-clear-btn').addEventListener('click', function() {
+                clearForm('dilr');
+            });
+            
+            document.getElementById('qa-clear-btn').addEventListener('click', function() {
+                clearForm('qa');
+            });
+            
+            // Add option buttons
+            document.getElementById('varc-add-option').addEventListener('click', function() {
+                const container = document.getElementById('varc-options-container');
+                const optionCount = container.querySelectorAll('.option-row').length;
+                const newOption = document.createElement('div');
+                newOption.className = 'option-row';
+                newOption.innerHTML = `
+                    <input type="text" class="varc-option" placeholder="Option ${optionCount + 1}">
+                    <button class="btn btn-danger btn-sm remove-option">×</button>
+                `;
+                container.appendChild(newOption);
+                
+                // Update correct answer max value
+                document.getElementById('varc-correctAnswer').max = optionCount + 1;
+            });
+            
+            document.getElementById('dilr-add-option').addEventListener('click', function() {
+                const container = document.getElementById('dilr-options-container');
+                const optionCount = container.querySelectorAll('.option-row').length;
+                const newOption = document.createElement('div');
+                newOption.className = 'option-row';
+                newOption.innerHTML = `
+                    <input type="text" class="dilr-option" placeholder="Option ${optionCount + 1}">
+                    <button class="btn btn-danger btn-sm remove-option">×</button>
+                `;
+                container.appendChild(newOption);
+                
+                // Update correct answer max value
+                document.getElementById('dilr-correctAnswer').max = optionCount + 1;
+            });
+            
+            document.getElementById('qa-add-option').addEventListener('click', function() {
+                const container = document.getElementById('qa-options-container');
+                const optionCount = container.querySelectorAll('.option-row').length;
+                const newOption = document.createElement('div');
+                newOption.className = 'option-row';
+                newOption.innerHTML = `
+                    <input type="text" class="qa-option" placeholder="Option ${optionCount + 1}">
+                    <button class="btn btn-danger btn-sm remove-option">×</button>
+                `;
+                container.appendChild(newOption);
+                
+                // Update correct answer max value
+                document.getElementById('qa-correctAnswer').max = optionCount + 1;
+            });
+            
+            // Remove option buttons
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-option')) {
+                    const optionRow = e.target.closest('.option-row');
+                    const container = optionRow.parentElement;
+                    const section = container.id.split('-')[0];
+                    
+                    optionRow.remove();
+                    
+                    // Update option numbering
+                    const options = container.querySelectorAll('.option-row');
+                    options.forEach((row, index) => {
+                        row.querySelector('input').placeholder = `Option ${index + 1}`;
+                    });
+                    
+                    // Update correct answer max if not TITA
+                    if (document.getElementById(`${section}-response-type`).value === 'mcq') {
+                        const correctAnswerInput = document.getElementById(`${section}-correctAnswer`);
+                        correctAnswerInput.max = options.length;
+                        if (parseInt(correctAnswerInput.value) > options.length) {
+                            correctAnswerInput.value = options.length;
+                        }
+                    }
+                }
+            });
+            
+            // Export buttons
+            document.getElementById('export-varc').addEventListener('click', function() {
+                generateOutput(['varc']);
+            });
+            
+            document.getElementById('export-dilr').addEventListener('click', function() {
+                generateOutput(['dilr']);
+            });
+            
+            document.getElementById('export-qa').addEventListener('click', function() {
+                generateOutput(['qa']);
+            });
+            
+            document.getElementById('export-all').addEventListener('click', function() {
+                generateOutput(['varc', 'dilr', 'qa']);
+            });
+            
+            // Copy button
+            document.getElementById('copy-btn').addEventListener('click', function() {
+                const output = document.getElementById('output');
+                navigator.clipboard.writeText(output.textContent)
+                    .then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = 'Copied!';
+                        this.classList.add('btn-success');
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.classList.remove('btn-success');
+                        }, 2000);
+                    })
+                    .catch(err => console.error('Failed to copy:', err));
+            });
+            
+            // Clear output button
+            document.getElementById('clear-output-btn').addEventListener('click', function() {
+                document.getElementById('output').textContent = '// Your formatted questions will appear here';
+            });
+            
+            // Initialize question lists
+            updateQuestionList('varc');
+            updateQuestionList('dilr');
+            updateQuestionList('qa');
+        });
+    </script>
+</body>
+</html>
