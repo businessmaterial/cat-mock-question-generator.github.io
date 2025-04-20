@@ -1038,10 +1038,10 @@ function generateOutput(sections) {
             }
             
             if (question.description) {
-                output += `            description: \`${question.description}\`,\n`;
+                output += `            description: \`${question.description}\`,\n\n`;
             }
             
-            output += `            question: "${question.question}",\n`;
+            output += `            question: \`${question.question}\`,\n`;
             
             if (question.image) {
                 output += `            image: "${question.image}",\n`;
